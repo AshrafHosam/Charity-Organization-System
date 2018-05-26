@@ -1,0 +1,138 @@
+drop table regions;
+create table regions(ID number (5) primary key);
+alter table regions add name varchar2(15);
+insert into regions values (1,'Cairo');
+insert into regions values (2,'Alexandria');
+select * from regions;
+
+drop table volunteers;
+create table volunteers(ID number(5) primary key , region_id number(5) references regions (ID)); 
+alter table volunteers ADD first_name varchar2(15);
+alter table volunteers ADD last_name varchar2(15);
+alter table volunteers ADD job varchar2(15);
+alter table volunteers ADD hours number (4);
+alter table volunteers ADD age number (2);
+alter table volunteers ADD gender varchar2(15);
+
+insert into volunteers values (1,1,'ashraf','hosam','finance manager',150,23,'Male');
+insert into volunteers values (2,1,'sameh','amr','project manager',150,23,'Male');
+select * from volunteers where region_id=1;
+
+drop table in_need;
+create table in_need (ID number (5) primary key, region_id number(5) references regions (ID));
+alter table in_need add first_name varchar2(15);
+alter table in_need add last_name varchar2(15);
+alter table in_need add address varchar2(50);
+alter table in_need add help_needed varchar2(50);
+insert into in_need values (1,1,'fname','lname','somwhere','money');
+insert into in_need values (2,1,'fname1','lname1','somwhere1','money');
+select * from in_need;
+
+
+drop table dependants_on_in_need;
+create table dependants_on_in_need (responsible_ID number(5) references in_need (ID));
+alter table dependants_on_in_need add first_name varchar2(15);
+alter table dependants_on_in_need add last_name varchar2(15);
+alter table dependants_on_in_need add gender varchar2(1);
+alter table dependants_on_in_need add age number(3);
+alter table dependants_on_in_need add relation varchar2(20);
+alter table dependants_on_in_need add constraint PK primary key (responsible_ID, last_name);
+insert into dependants_on_in_need values (1,'ffname','llname','M',20,'son');
+insert into dependants_on_in_need values (1,'hisfist','hislast','M',6,'son');
+select * from dependants_on_in_need;
+
+select responsible_ID from dependants_on_in_need;
+
+drop table donors;
+create table donors(ID number(5) primary key);
+alter table donors add first_name varchar2(15);
+alter table donors add last_name varchar2(15);
+alter table donors add help_provided varchar2(15);
+insert into donors values (1,'first','last', 'money');
+insert into donors values (2,'first1','last1', 'money');
+select id from donors;
+
+drop table donors_contact_info;
+create table donors_contact_info(donor_ID number (5) references donors(ID) primary key);
+alter table donors_contact_info add email varchar2(30);
+alter table donors_contact_info add phone_number number(20);
+insert into donors_contact_info values (1,'first@gmail.com', 0111);
+insert into donors_contact_info values (2,'second@gmail.com',0100);
+select * from donors_contact_info;
+
+drop table donor_region_info;
+create table donor_region_info(donor_ID number(5) , region_ID number(5) references regions(ID) , primary key (donor_ID , region_ID));
+
+
+insert into donor_region_info values ('1','1');
+insert into donor_region_info values ('2','1');
+insert into donor_region_info values ('3','1');
+insert into donor_region_info values ('1','2');
+
+alter table donor_region_info add region_name varchar2(15);
+
+
+
+select * from donor_region_info;
+
+select * donors where id = (select )
+
+
+
+
+create or replace procedure delete_a_volunteer
+(volunteer_id in NUMBER )
+as
+begin 
+delete from volunteers
+where id=volunteer_id ;
+end ;
+=====================
+create or replace PROCEDURE get_volunteers_info
+(reg_id in NUMBER , volunteers out sys_refcursor)
+as
+begin
+open volunteers for
+select *
+from volunteers
+where id=reg_id ;
+end ;
+======================
+create or replace procedure insert_to_volunteers
+(volunteer_id in NUMBER ,rid in NUMBER,firstname in varchar2,lastname in VARCHAR2 ,j in VARCHAR2 , hour in NUMBER ,age in NUMBER ,gen in VARCHAR2)
+as
+begin 
+insert into volunteers (id , region_id ,first_name, last_name, job, hours, age, gender)
+values (volunteer_id, rid , firstname , lastname,j, hour, age, gen);
+end ;
+=======================
+create or replace procedure update_volunteers_table
+(ids in NUMBER,fname in varchar2,lname in VARCHAR2 ,j in VARCHAR2 , hour in NUMBER ,age in NUMBER ,gen in VARCHAR2)
+as
+begin 
+update volunteers
+set first_name= fname,
+ last_name= lname ,
+ job= j,
+ hours= hour,
+ age= age, 
+ gender= gen
+where id= ids ;
+end ;
+
+============================================
+
+create or replace
+PROCEDURE get_donors_info
+(required_id in NUMBER , phone out NUMBER )
+as
+begin
+select phone_number into phone from donors_contact_info
+where donor_id= required_id;
+end ;
+
+
+
+
+
+commit;
